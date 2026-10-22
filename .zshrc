@@ -138,30 +138,24 @@ alias k='kubectl'
 
 unalias gco kgp kcp kpod p 2>/dev/null
 gco() {
-  if (( $# )); then
-    command git checkout "$@"
-    return $?
+  [ "$#" -gt 0 ] && { git checkout "$@"; return; }
+  local cur sel branch wt
+  cur=$(git rev-parse --abbrev-ref HEAD) || return
+  sel=$(git branch --sort=-committerdate --format=$'%(refname:short)\t%(worktreepath)' \
+    | awk -F'\t' -v cur="$cur" '$1 != cur' \
+    | sed "s|$HOME|~|" \
+    | column -t -s $'\t' \
+    | fzf --header "Checkout Recent Branch. current branch: $cur" \
+          --preview 'git diff {1} --color=always' --preview-window top) || return
+  branch=${sel%% *}
+  wt=$(git for-each-ref --format='%(worktreepath)' "refs/heads/$branch")
+  if [ -n "$wt" ]; then
+    cd "$wt"
+  else
+    git checkout "$branch"
   fi
-  (( $+commands[git] && $+commands[fzf] )) || return 1
-  [[ $(command git rev-parse --is-inside-work-tree 2>/dev/null) == true ]] || return 1
-  local current refs ref symbolic branch selection
-  local -aU branches
-  current=$(command git rev-parse --abbrev-ref HEAD) || return
-  refs=$(command git for-each-ref --sort=-committerdate --format='%(refname)%09%(symref)' refs/heads refs/remotes) || return
-  while IFS=$'\t' read -r ref symbolic; do
-    [[ -n $ref && -z $symbolic ]] || continue
-    case "$ref" in
-      refs/heads/*) branch=${ref#refs/heads/} ;;
-      refs/remotes/*) branch=${ref#refs/remotes/}; branch=${branch#*/} ;;
-      *) continue ;;
-    esac
-    [[ $branch != "$current" ]] && branches+=("$branch")
-  done <<< "$refs"
-  (( ${#branches} )) || return 0
-  selection=$(print -rl -- "${branches[@]}" | fzf --header "Checkout Recent Branch. current branch: $current" --preview 'git diff {} --color=always' --preview-window top) || return 0
-  [[ -n $selection ]] || return 0
-  command git checkout "$selection"
 }
+
 
 kgp() {
   (( $+commands[kubectl] && $+commands[fzf] )) || return 1
