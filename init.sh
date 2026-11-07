@@ -47,6 +47,7 @@ echo "==> [2/8] Creating dotfiles symlinks..."
 mkdir -p "$HOME/.config"
 mkdir -p "$HOME/.config/git/hooks"
 mkdir -p "$HOME/.config/opencode"
+mkdir -p "$HOME/.omp/agent"
 ln -snf "$REPO_ROOT/.tmux.conf" "$HOME/.tmux.conf"
 ln -snf "$REPO_ROOT/.zshrc" "$HOME/.zshrc"
 ln -snf "$REPO_ROOT/.config/nvim" "$HOME/.config/nvim"
@@ -54,7 +55,9 @@ ln -snf "$REPO_ROOT/.config/git/ignore" "$HOME/.config/git/ignore"
 ln -snf "$REPO_ROOT/.config/git/hooks/pre-commit" "$HOME/.config/git/hooks/pre-commit"
 chmod +x "$REPO_ROOT/.config/git/hooks/pre-commit" "$HOME/.config/git/hooks/pre-commit" 2>/dev/null || true
 ln -snf "$REPO_ROOT/.config/opencode/opencode.jsonc" "$HOME/.config/opencode/opencode.jsonc"
-echo "Symlinks created (.tmux.conf, .zshrc, .config/nvim, .config/git, .config/opencode/opencode.jsonc)"
+ln -snf "$REPO_ROOT/.config/omp/agent/models.yml" "$HOME/.omp/agent/models.yml"
+ln -snf "$REPO_ROOT/.config/omp/agent/config.yml" "$HOME/.omp/agent/config.yml"
+echo "Symlinks created (.tmux.conf, .zshrc, .config/nvim, .config/git, .config/opencode/opencode.jsonc, .omp/agent)"
 
 # ------------------------------------------------------------------------------
 # 3. Install Base Packages via Package Manager (APT / Homebrew)
@@ -147,6 +150,17 @@ if ! command -v omo >/dev/null 2>&1; then
     npm install -g omo-ai
 else
     echo "omo is already installed."
+fi
+
+if ! command -v omp >/dev/null 2>&1; then
+    echo "Installing oh-my-pi (omp)..."
+    if command -v bun >/dev/null 2>&1; then
+        bun install -g @oh-my-pi/pi-coding-agent
+    else
+        npm install -g @oh-my-pi/pi-coding-agent
+    fi
+else
+    echo "omp is already installed."
 fi
 
 # ------------------------------------------------------------------------------
@@ -282,6 +296,11 @@ fi
 # Kubectl zsh completion
 if command -v kubectl >/dev/null 2>&1; then
     kubectl completion zsh > "$HOME/.kube-completion.bash"
+fi
+
+# Oh My Pi (omp) zsh completion
+if command -v omp >/dev/null 2>&1; then
+    omp completions zsh > "$HOME/.omp-completion.zsh" 2>/dev/null || true
 fi
 
 # Neovim plugins update

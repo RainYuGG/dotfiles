@@ -1,0 +1,18 @@
+providers:
+  local-server:
+    baseUrl: "http://localhost:8001/v1"
+    api: openai-completions
+    apiKey: LOCAL_SERVER_API_KEY
+    models:
+      - id: qwen3.8-27b
+        name: Qwen3.8 27B (local vLLM)
+        reasoning: true
+        tokenizer: qwen3
+        input: [text]
+        contextWindow: 262144
+        maxTokens: 65536
+        cost:
+          input: 0
+          output: 0
+          cacheRead: 0
+          cacheWrite: 0

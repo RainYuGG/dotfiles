@@ -17,9 +17,9 @@
 * **程式編輯**：
   * **Neovim** (0.11+) 現代化開發環境，採用 **Lazy.nvim** 外掛管理。
   * 整合 **Mason + LSP**、**nvim-cmp** 代碼補全、**Which-Key (v3)**、**Neo-tree** 與快速檔案切換。
-* **AI 終端 Agent (OpenCode & OmO)**：
-  * 內建 **OpenCode** (`opencode-ai`) 與 **Oh My OpenAgent** (`omo-ai`) npm 全域工具。
-  * 核心設定檔脫敏保存於倉庫（`opencode.jsonc`），以環境變數佔位符取代寫死的憑證。
+* **AI 終端 Agent (OpenCode, OmO & Oh My Pi)**：
+  * 內建 **OpenCode** (`opencode-ai`)、**Oh My OpenAgent** (`omo-ai`) 與 **Oh My Pi** (`@oh-my-pi/pi-coding-agent`，指令 `omp`，提供 `pi` 快捷別名)。
+  * 核心設定檔脫敏保存於倉庫（`opencode.jsonc` 與 `.config/omp/agent/`），共享 `LOCAL_SERVER_API_KEY` 本地模型 API 金鑰。
 * **安全憑證與機密防護 (Secret Management & Leak Prevention)**：
   * **Git Clean Filter 自動脫敏**：本機可直接於 `.zshrc` 設定 `LOCAL_SERVER_API_KEY`，透過 `.gitattributes` 與 Git Clean Filter，在 commit 時自動過濾為空字串，Repo 永遠保持純淨。
   * **全域 Pre-Commit 攔截**：透過 Git 全域 `core.hooksPath` 自動設定 Hook，若暂存區內含未脫敏的 API Key 或敏感 Token，**直接阻止 Commit**。
@@ -66,13 +66,13 @@ exec zsh
 | 步驟 | 項目 | Ubuntu (Linux) 處理方式 | macOS (Darwin) 處理方式 |
 | :--- | :--- | :--- | :--- |
 | **[1/8]** | **平台偵測** | 識別為 `ubuntu` | 識別為 `macos` |
-| **[2/8]** | **建立軟連結** | 連結 `.tmux.conf`, `.zshrc`, `.config/nvim`, `.config/git/ignore`, `.config/git/hooks/pre-commit`, `.config/opencode` | 同左 |
+| **[2/8]** | **建立軟連結** | 連結 `.tmux.conf`, `.zshrc`, `.config/nvim`, `.config/git/ignore`, `.config/git/hooks/pre-commit`, `.config/opencode`, `.omp/agent` | 同左 |
 | **[3/8]** | **基礎套件安裝** | 透過 **APT** 安裝系統基礎工具（`zsh`, `tmux`, `bat`, `ripgrep`, `fd-find`, `zoxide` 等） | 透過 **Homebrew** 安裝基礎工具、**`gitleaks`** 與 **`pre-commit`** |
-| **[4/8]** | **開發語言與全域工具** | 安裝 Node.js 22、Bun，透過 npm 全域安裝 **`opencode-ai`** 與 **`omo-ai`**；Snap 安裝 `nvim`, `helm`, `kubectl`, `go` | 由 Homebrew 與 npm 管理全域工具 |
+| **[4/8]** | **開發語言與全域工具** | 安裝 Node.js 22、Bun，安裝 **`opencode-ai`**、**`omo-ai`** 與 **`@oh-my-pi/pi-coding-agent`** (`omp`)；Snap 安裝 `nvim`, `helm`, `kubectl`, `go` | 由 Homebrew、Bun 與 npm 管理全域工具 |
 | **[5/8]** | **Git Delta & Gitleaks** | 自 GitHub Releases 下載對應架構之 `delta` (.deb) 與 **`gitleaks`** 二進位檔 | 先前已由 Homebrew 裝妥，直接略過 |
 | **[6/8]** | **fzf** | Git Clone 至 `~/.fzf` 並執行官方 `./install` 安裝最新二進位檔 | 先前已由 Homebrew 裝妥，直接略過 |
 | **[7/8]** | **終端擴充套件** | 自動 Clone 並更新 **Oh My Zsh**、**Powerlevel10k**、**TPM**，觸發外掛安裝 | 同左 |
-| **[8/8]** | **工具設定與安全過濾** | ① 配置 Git 全域設定、`core.excludesfile` 與 **`core.hooksPath`**<br>② 設定 **`clean-secrets`** Git 過濾器（自動過濾 API Key） | 同左 |
+| **[8/8]** | **工具設定與安全過濾** | ① 配置 Git 全域設定、`core.excludesfile` 與 **`core.hooksPath`**<br>② 設定 **`clean-secrets`** Git 過濾器（自動過濾 API Key）<br>③ 自動生成 Kubectl 與 OMP 的 Zsh 自動補全腳本 | 同左 |
 
 ---
 
@@ -87,7 +87,7 @@ exec zsh
   ```bash
   export LOCAL_SERVER_API_KEY="<your-api-key>"
   ```
-  OpenCode 啟動時即可無縫透過 `{env:LOCAL_SERVER_API_KEY}` 取得憑證。
+  OpenCode 啟動時即可無縫透過 `{env:LOCAL_SERVER_API_KEY}` 取得憑證；Oh My Pi (`omp`) 亦自動讀取此環境變數作為本地模型的 API Key。
 * **Git 自動過濾（Clean Filter）**：
   透過 [.gitattributes](.gitattributes) 與 Git 的 `clean-secrets` 過濾器，任何時候 Git 執行暫存（`git add`）或提交（`git commit`）時，系統會自動將金鑰過濾為空字串：
   ```bash

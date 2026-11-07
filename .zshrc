@@ -89,6 +89,7 @@ fi
 if (( ! $+functions[compdef] )) &&
    { { (( $+commands[npm] )) && [[ -r "$HOME/.npm-completion.bash" ]]; } ||
      { (( $+commands[kubectl] )) && [[ -r "$HOME/.kube-completion.bash" ]]; } ||
+     { (( $+commands[omp] )) && [[ -r "$HOME/.omp-completion.zsh" ]]; } ||
      (( $+commands[fzf] )); }; then
   autoload -Uz compinit
   compinit -i -D
@@ -104,6 +105,9 @@ if (( $+commands[npm] )) && [[ -r "$HOME/.npm-completion.bash" ]]; then
 fi
 if (( $+commands[kubectl] )) && [[ -r "$HOME/.kube-completion.bash" ]]; then
   source "$HOME/.kube-completion.bash"
+fi
+if (( $+commands[omp] )) && [[ -r "$HOME/.omp-completion.zsh" ]]; then
+  source "$HOME/.omp-completion.zsh"
 fi
 _ZO_DATA_DIR='$HOME/.local/share'
 _ZO_ECHO='1'
@@ -130,6 +134,7 @@ alias python='python3'
 alias py='python3'
 alias dk='docker'
 alias oc='opencode'
+alias pi='omp'
 alias glog='git log --graph --color=always --abbrev-commit --decorate --date=relative --pretty=medium --oneline'
 alias gpfwl='git push --force-with-lease origin $(git rev-parse --abbrev-ref HEAD)'
 alias gpsu='git push --set-upstream origin $(git rev-parse --abbrev-ref HEAD)'
