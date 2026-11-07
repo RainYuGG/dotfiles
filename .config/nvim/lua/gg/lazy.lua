@@ -253,20 +253,20 @@ local plugin_specs = {
 	-- Tmux Navigator
 	{
 		"christoomey/vim-tmux-navigator",
-		cmd = {
-			"TmuxNavigateLeft",
-			"TmuxNavigateDown",
-			"TmuxNavigateUp",
-			"TmuxNavigateRight",
-			"TmuxNavigatePrevious",
-		},
-		keys = {
-			{ "<c-h>", "<cmd>TmuxNavigateLeft<cr>" },
-			{ "<c-j>", "<cmd>TmuxNavigateDown<cr>" },
-			{ "<c-k>", "<cmd>TmuxNavigateUp<cr>" },
-			{ "<c-l>", "<cmd>TmuxNavigateRight<cr>" },
-			{ "<c-\\>", "<cmd>TmuxNavigatePrevious<cr>" },
-		},
+		lazy = false,
+		init = function()
+			vim.g.tmux_navigator_no_mappings = 1
+		end,
+		config = function()
+			local output = vim.fn.system({ "herdr", "plugin", "list", "--plugin", "vim-herdr-navigation", "--json" })
+			assert(vim.v.shell_error == 0, "Cannot query Herdr navigation plugin: " .. output)
+			local plugin = vim.json.decode(output).result.plugins[1]
+			assert(plugin and plugin.plugin_root, "Install vim-herdr-navigation with init.sh first")
+			dofile(plugin.plugin_root .. "/editor/nvim.lua")
+			if vim.env.TMUX and vim.env.TMUX ~= "" then
+				vim.keymap.set("n", "<C-\\>", "<cmd>TmuxNavigatePrevious<cr>", { silent = true, desc = "Previous tmux pane" })
+			end
+		end,
 	},
 }
 

@@ -47,6 +47,7 @@ echo "==> [2/8] Creating dotfiles symlinks..."
 mkdir -p "$HOME/.config"
 mkdir -p "$HOME/.config/git/hooks"
 mkdir -p "$HOME/.config/opencode"
+mkdir -p "$HOME/.config/herdr"
 mkdir -p "$HOME/.omp/agent"
 ln -snf "$REPO_ROOT/.tmux.conf" "$HOME/.tmux.conf"
 ln -snf "$REPO_ROOT/.zshrc" "$HOME/.zshrc"
@@ -55,9 +56,10 @@ ln -snf "$REPO_ROOT/.config/git/ignore" "$HOME/.config/git/ignore"
 ln -snf "$REPO_ROOT/.config/git/hooks/pre-commit" "$HOME/.config/git/hooks/pre-commit"
 chmod +x "$REPO_ROOT/.config/git/hooks/pre-commit" "$HOME/.config/git/hooks/pre-commit" 2>/dev/null || true
 ln -snf "$REPO_ROOT/.config/opencode/opencode.jsonc" "$HOME/.config/opencode/opencode.jsonc"
+ln -snf "$REPO_ROOT/.config/herdr/config.toml" "$HOME/.config/herdr/config.toml"
 ln -snf "$REPO_ROOT/.config/omp/agent/models.yml" "$HOME/.omp/agent/models.yml"
 ln -snf "$REPO_ROOT/.config/omp/agent/config.yml" "$HOME/.omp/agent/config.yml"
-echo "Symlinks created (.tmux.conf, .zshrc, .config/nvim, .config/git, .config/opencode/opencode.jsonc, .omp/agent)"
+echo "Symlinks created (.tmux.conf, .zshrc, .config/nvim, .config/git, .config/opencode/opencode.jsonc, .config/herdr/config.toml, .omp/agent)"
 
 # ------------------------------------------------------------------------------
 # 3. Install Base Packages via Package Manager (APT / Homebrew)
@@ -67,7 +69,7 @@ if [[ "$PLATFORM" == "ubuntu" ]]; then
     echo "Installing Ubuntu base packages via apt..."
     sudo apt update
     sudo apt install -y \
-        zsh tmux bat universal-ctags xclip unzip build-essential \
+        zsh tmux bat universal-ctags xclip unzip build-essential jq \
         ripgrep fd-find zoxide thefuck cmatrix tree gh ca-certificates curl gnupg
 
     # Ubuntu package names conflict resolution: fd-find installs as 'fdfind', bat as 'batcat'
@@ -94,7 +96,7 @@ elif [[ "$PLATFORM" == "macos" ]]; then
     brew install \
         tmux bat universal-ctags unzip ripgrep fd thefuck cmatrix tree gh \
         neovim helm kubernetes-cli go git-delta fzf zoxide node@22 tree-sitter-cli \
-        gitleaks pre-commit
+        gitleaks pre-commit jq
 fi
 
 # ------------------------------------------------------------------------------
@@ -137,6 +139,7 @@ else
     echo "bun is already installed."
 fi
 export PATH="$HOME/.bun/bin:$PATH"
+export PATH="$HOME/.local/bin:$PATH"
 
 if ! command -v opencode >/dev/null 2>&1; then
     echo "Installing opencode via npm..."
@@ -161,6 +164,24 @@ if ! command -v omp >/dev/null 2>&1; then
     fi
 else
     echo "omp is already installed."
+fi
+
+if ! command -v herdr >/dev/null 2>&1; then
+    echo "Installing Herdr..."
+    curl -fsSL https://herdr.dev/install.sh | sh
+else
+    echo "Herdr is already installed."
+fi
+
+HERDR_NAV_COMMIT="7873100eb47212269005c693effb2a844986b30f"
+if herdr plugin list --plugin vim-herdr-navigation --json | \
+   jq -e '.result.plugins[] | select(.source.kind == "local")' >/dev/null; then
+    herdr plugin unlink vim-herdr-navigation
+fi
+if ! herdr plugin list | grep -F "[github:paulbkim-dev/vim-herdr-navigation@$HERDR_NAV_COMMIT]" >/dev/null; then
+    herdr plugin install paulbkim-dev/vim-herdr-navigation --ref "$HERDR_NAV_COMMIT" --yes
+else
+    echo "Pinned Vim/Herdr navigation plugin is already installed."
 fi
 
 # ------------------------------------------------------------------------------

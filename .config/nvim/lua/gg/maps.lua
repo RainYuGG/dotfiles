@@ -11,13 +11,6 @@ wk.add({
 	{ "<C-E>", "<ESC>A", desc = "Go to end of line", mode = "i" },
 	{ "<C-A>", "<ESC>I", desc = "Go to start of line", mode = "i" },
 
-	-- Window & Tmux navigation (vim-tmux-navigator)
-	{ "<C-h>", "<cmd>TmuxNavigateLeft<cr>", desc = "Window / tmux left" },
-	{ "<C-j>", "<cmd>TmuxNavigateDown<cr>", desc = "Window / tmux down" },
-	{ "<C-k>", "<cmd>TmuxNavigateUp<cr>", desc = "Window / tmux up" },
-	{ "<C-l>", "<cmd>TmuxNavigateRight<cr>", desc = "Window / tmux right" },
-	{ "<C-\\>", "<cmd>TmuxNavigatePrevious<cr>", desc = "Window / tmux previous" },
-
 	-- Telescope: Find (<leader>f)
 	{ "<leader>f", group = "find" },
 	{ "<leader>ff", "<CMD>Telescope find_files<CR>", desc = "Find files" },

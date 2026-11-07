@@ -14,6 +14,7 @@
   * 針對 **Ubuntu** 與 **macOS** 自動適配相應指令（如 `batcat`/`bat`、`fdfind`/`fd`、`xclip`/`pbcopy`）。
 * **終端多工**：
   * **Tmux** 預設設定，整合 **TPM (Tmux Plugin Manager)** 進行外掛管理與自動安裝。
+  * **Herdr** 與 Tmux 並存，支援 Neovim split 與 Herdr pane 間的統一導航。
 * **程式編輯**：
   * **Neovim** (0.11+) 現代化開發環境，採用 **Lazy.nvim** 外掛管理。
   * 整合 **Mason + LSP**、**nvim-cmp** 代碼補全、**Which-Key (v3)**、**Neo-tree** 與快速檔案切換。
@@ -105,6 +106,47 @@ exec zsh
 
 ## 常用命令與別名
 
+### Herdr 操作與維護
+
+在專案目錄執行 `herdr` 啟動或重新連接。設定檔由 `init.sh` 建立軟連結：
+`~/.config/herdr/config.toml` → repo 的 `.config/herdr/config.toml`。
+
+Prefix 為 `Ctrl+A`；下表的 `→` 代表依序按鍵，不是同時按住。
+
+| 操作 | 快捷鍵 |
+| :--- | :--- |
+| 左右分割 pane | `Ctrl+A` → `\|` |
+| 上下分割 pane | `Ctrl+A` → `-` |
+| Resize mode | `Ctrl+A` → `r`，再連按／長按方向鍵或 `h/j/k/l` |
+| 離開 Resize mode | `Esc` 或 `Enter` |
+| Reload config | `Ctrl+A` → `Shift+R` |
+| Neovim split／pane 導航 | 直接按 `Ctrl+h/j/k/l`；Neovim normal mode 內先切 split，到邊界再切 pane |
+| 強制切換 Herdr pane | `Ctrl+A` → `h/j/k/l` |
+| Detach，保留背景工作 | `Ctrl+A` → `q`；執行 `herdr` 重新連接 |
+
+注意：目前未綁定 `Prefix + 方向鍵` 的單次 resize，需先進入 Resize mode。
+全域導航會取代 shell 的 `Ctrl+K`（刪除到行尾）、`Ctrl+L`（清畫面）；清畫面可改執行 `clear`。
+
+導航使用社群套件 [vim-herdr-navigation](https://github.com/paulbkim-dev/vim-herdr-navigation)，
+由 `herdr plugin install` 管理，現有 `vim-tmux-navigator` 的 Neovim 設定透過以下指令查詢 `plugin_root`，載入同一份 `editor/nvim.lua`，不另建 lazy spec 或重複下載：
+
+```bash
+herdr plugin list --plugin vim-herdr-navigation --json
+```
+
+在 tmux 環境仍使用 `TmuxNavigate*`；`Ctrl+\` 保留為切換上一個 tmux pane。
+需要先完成 `init.sh` 的 Herdr/plugin 安裝，Neovim 才能載入這份導航程式。
+
+目前固定在已審查的 commit `7873100eb47212269005c693effb2a844986b30f`，由 `init.sh` 的 `HERDR_NAV_COMMIT` 控制。
+更新時先審查新版本，再修改該變數並安裝同一個完整 commit SHA：
+
+```bash
+herdr plugin install paulbkim-dev/vim-herdr-navigation --ref <已審查的新-commit-SHA>
+herdr server reload-config
+```
+
+更新後重新啟動 Neovim。不要將 ref 改成浮動的 `master`；固定版本不代表未來更新已通過安全審查。
+
 ### Git 常用操作
 * `gco`：透過 **fzf** 互動式選單檢視最近分支並快速切換。
 * `glog`：美化樹狀單行 Commit 歷史圖。
@@ -138,6 +180,7 @@ dotfiles/
 │   │   ├── hooks/
 │   │   │   └── pre-commit    # 全域 Gitleaks 機密檢查 Hook
 │   │   └── ignore            # 全域 Git 忽略規則 (.omo, *.local, .env* 等)
+│   ├── herdr/config.toml      # Herdr 快捷鍵、外觀與 Vim-aware pane 導航
 │   ├── nvim/                 # Neovim (Lazy.nvim, LSP, Treesitter, etc.)
 │   └── opencode/             # OpenCode 核心設定 (opencode.jsonc)
 ├── .tmux.conf                # Tmux 設定檔
