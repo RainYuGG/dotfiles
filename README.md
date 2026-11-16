@@ -121,31 +121,33 @@ Prefix 為 `Ctrl+A`；下表的 `→` 代表依序按鍵，不是同時按住。
 | 離開 Resize mode | `Esc` 或 `Enter` |
 | Reload config | `Ctrl+A` → `Shift+R` |
 | Neovim split／pane 導航 | 直接按 `Ctrl+h/j/k/l`；Neovim normal mode 內先切 split，到邊界再切 pane |
+| Neovim split／pane 調大小 | `Alt+h/j/k/l`；Neovim split 原生調大小，填滿終端時調 Herdr pane |
 | 強制切換 Herdr pane | `Ctrl+A` → `h/j/k/l` |
 | Detach，保留背景工作 | `Ctrl+A` → `q`；執行 `herdr` 重新連接 |
 
 注意：目前未綁定 `Prefix + 方向鍵` 的單次 resize，需先進入 Resize mode。
 全域導航會取代 shell 的 `Ctrl+K`（刪除到行尾）、`Ctrl+L`（清畫面）；清畫面可改執行 `clear`。
 
-導航使用社群套件 [vim-herdr-navigation](https://github.com/paulbkim-dev/vim-herdr-navigation)，
-由 `herdr plugin install` 管理，現有 `vim-tmux-navigator` 的 Neovim 設定透過以下指令查詢 `plugin_root`，載入同一份 `editor/nvim.lua`，不另建 lazy spec 或重複下載：
+導航使用社群套件 [herdr-splits.nvim](https://github.com/lmilojevicc/herdr-splits.nvim)，
+兩端各一半：Herdr 端的 `nav-*`／`resize-*` actions 由 `herdr plugin install` 管理，
+Neovim 端由 lazy spec 管理，只在 Herdr 環境內載入（`HERDR_ENV == "1"`）。
+功能包含跨 split／pane 導航與調大小、邊界 wrap、離開 zoomed pane 自動 unzoom，
+並自動忽略 neo-tree 等 sidebar，不會把按鍵卡在 picker 裡。
+
+在 tmux（非 Herdr）環境改用 `vim-tmux-navigator` 的預設 mapping 導航 tmux pane；
+`Ctrl+\` 保留為切換上一個 tmux pane。Herdr 內則由 herdr-splits 接手，
+兩個 plugin 以 `HERDR_ENV` 互斥載入，不會同時綁定同一組按鍵。
+
+目前固定在已審查的 version tag `v0.5.4`，由 `init.sh` 的 `HERDR_SPLITS_REF` 控制。
+舊的 `vim-herdr-navigation` 需手動移除：`herdr plugin uninstall vim-herdr-navigation`。
+更新時先審查新版本，再修改該變數並安裝對應的 tag：
 
 ```bash
-herdr plugin list --plugin vim-herdr-navigation --json
-```
-
-在 tmux 環境仍使用 `TmuxNavigate*`；`Ctrl+\` 保留為切換上一個 tmux pane。
-需要先完成 `init.sh` 的 Herdr/plugin 安裝，Neovim 才能載入這份導航程式。
-
-目前固定在已審查的 commit `7873100eb47212269005c693effb2a844986b30f`，由 `init.sh` 的 `HERDR_NAV_COMMIT` 控制。
-更新時先審查新版本，再修改該變數並安裝同一個完整 commit SHA：
-
-```bash
-herdr plugin install paulbkim-dev/vim-herdr-navigation --ref <已審查的新-commit-SHA>
+herdr plugin install lmilojevicc/herdr-splits.nvim --ref <已審查的新-version-tag>
 herdr server reload-config
 ```
 
-更新後重新啟動 Neovim。不要將 ref 改成浮動的 `master`；固定版本不代表未來更新已通過安全審查。
+更新後重新啟動 Neovim。不要將 ref 改成浮動的 `main`；固定版本不代表未來更新已通過安全審查。
 
 ### Git 常用操作
 * `gco`：透過 **fzf** 互動式選單檢視最近分支並快速切換。
@@ -180,7 +182,7 @@ dotfiles/
 │   │   ├── hooks/
 │   │   │   └── pre-commit    # 全域 Gitleaks 機密檢查 Hook
 │   │   └── ignore            # 全域 Git 忽略規則 (.omo, *.local, .env* 等)
-│   ├── herdr/config.toml      # Herdr 快捷鍵、外觀與 Vim-aware pane 導航
+│   ├── herdr/config.toml      # Herdr 快捷鍵、外觀與 Neovim/Herdr split 導航調大小
 │   ├── nvim/                 # Neovim (Lazy.nvim, LSP, Treesitter, etc.)
 │   └── opencode/             # OpenCode 核心設定 (opencode.jsonc)
 ├── .tmux.conf                # Tmux 設定檔

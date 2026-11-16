@@ -250,23 +250,39 @@ local plugin_specs = {
 		"vimwiki/vimwiki",
 	},
 
-	-- Tmux Navigator
+	-- Tmux Navigator (outside Herdr only; inside Herdr use herdr-splits)
 	{
 		"christoomey/vim-tmux-navigator",
-		lazy = false,
-		init = function()
-			vim.g.tmux_navigator_no_mappings = 1
-		end,
+		cond = vim.env.HERDR_ENV ~= "1",
+		event = "VeryLazy",
 		config = function()
-			local output = vim.fn.system({ "herdr", "plugin", "list", "--plugin", "vim-herdr-navigation", "--json" })
-			assert(vim.v.shell_error == 0, "Cannot query Herdr navigation plugin: " .. output)
-			local plugin = vim.json.decode(output).result.plugins[1]
-			assert(plugin and plugin.plugin_root, "Install vim-herdr-navigation with init.sh first")
-			dofile(plugin.plugin_root .. "/editor/nvim.lua")
 			if vim.env.TMUX and vim.env.TMUX ~= "" then
 				vim.keymap.set("n", "<C-\\>", "<cmd>TmuxNavigatePrevious<cr>", { silent = true, desc = "Previous tmux pane" })
 			end
 		end,
+	},
+
+	-- Herdr Splits (inside Herdr only: nav + resize across Neovim splits and Herdr panes)
+	{
+		"lmilojevicc/herdr-splits.nvim",
+		cond = vim.env.HERDR_ENV == "1",
+		event = "VeryLazy",
+		config = function()
+			-- All options use defaults: unzoom_on_nav = true (unzoom when
+			-- navigating away from a zoomed pane), at_edge = "wrap",
+			-- nav_at_edge = "wrap", nav_keys = <C-h/j/k/l>, resize_keys = <M-h/j/k/l>.
+			require("herdr-splits").setup({})
+		end,
+		keys = {
+			{ "<C-h>", function() require("herdr-splits").move_cursor_left() end, desc = "Navigate left" },
+			{ "<C-j>", function() require("herdr-splits").move_cursor_down() end, desc = "Navigate down" },
+			{ "<C-k>", function() require("herdr-splits").move_cursor_up() end, desc = "Navigate up" },
+			{ "<C-l>", function() require("herdr-splits").move_cursor_right() end, desc = "Navigate right" },
+			{ "<M-h>", function() require("herdr-splits").resize_left() end, desc = "Resize left" },
+			{ "<M-j>", function() require("herdr-splits").resize_down() end, desc = "Resize down" },
+			{ "<M-k>", function() require("herdr-splits").resize_up() end, desc = "Resize up" },
+			{ "<M-l>", function() require("herdr-splits").resize_right() end, desc = "Resize right" },
+		},
 	},
 }
 
