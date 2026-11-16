@@ -58,8 +58,7 @@ chmod +x "$REPO_ROOT/.config/git/hooks/pre-commit" "$HOME/.config/git/hooks/pre-
 ln -snf "$REPO_ROOT/.config/opencode/opencode.jsonc" "$HOME/.config/opencode/opencode.jsonc"
 ln -snf "$REPO_ROOT/.config/herdr/config.toml" "$HOME/.config/herdr/config.toml"
 ln -snf "$REPO_ROOT/.config/omp/agent/models.yml" "$HOME/.omp/agent/models.yml"
-ln -snf "$REPO_ROOT/.config/omp/agent/config.yml" "$HOME/.omp/agent/config.yml"
-echo "Symlinks created (.tmux.conf, .zshrc, .config/nvim, .config/git, .config/opencode/opencode.jsonc, .config/herdr/config.toml, .omp/agent)"
+echo "Symlinks created (.tmux.conf, .zshrc, .config/nvim, .config/git, .config/opencode/opencode.jsonc, .config/herdr/config.toml, .omp/agent/models.yml)"
 
 # ------------------------------------------------------------------------------
 # 3. Install Base Packages via Package Manager (APT / Homebrew)

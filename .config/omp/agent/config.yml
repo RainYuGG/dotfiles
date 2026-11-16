@@ -1,4 +1,0 @@
-setupVersion: 2
-modelRoles:
-  default: google-antigravity/gemini-4-argon-low
-defaultThinkingLevel: auto
