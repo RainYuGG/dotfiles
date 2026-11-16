@@ -173,15 +173,11 @@ else
     echo "Herdr is already installed."
 fi
 
-HERDR_NAV_COMMIT="7873100eb47212269005c693effb2a844986b30f"
-if herdr plugin list --plugin vim-herdr-navigation --json | \
-   jq -e '.result.plugins[] | select(.source.kind == "local")' >/dev/null; then
-    herdr plugin unlink vim-herdr-navigation
-fi
-if ! herdr plugin list | grep -F "[github:paulbkim-dev/vim-herdr-navigation@$HERDR_NAV_COMMIT]" >/dev/null; then
-    herdr plugin install paulbkim-dev/vim-herdr-navigation --ref "$HERDR_NAV_COMMIT" --yes
+HERDR_SPLITS_REF="v0.5.4"
+if ! herdr plugin list | grep -F "[github:lmilojevicc/herdr-splits.nvim@$HERDR_SPLITS_REF]" >/dev/null; then
+    herdr plugin install lmilojevicc/herdr-splits.nvim --ref "$HERDR_SPLITS_REF" --yes
 else
-    echo "Pinned Vim/Herdr navigation plugin is already installed."
+    echo "Pinned Herdr splits navigation plugin is already installed."
 fi
 
 # ------------------------------------------------------------------------------
