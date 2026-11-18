@@ -204,6 +204,14 @@ local plugin_specs = {
 		opts = {},
 	},
 
+	-- Code Folds (Ufo)
+	{
+		"kevinhwang91/nvim-ufo",
+		event = "BufReadPost",
+		dependencies = { "kevinhwang91/promise-async" },
+		opts = {},
+	},
+
 	-- Bufferline & Statusline
 	{
 		"akinsho/bufferline.nvim",
