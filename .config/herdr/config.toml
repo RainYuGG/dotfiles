@@ -13,15 +13,13 @@ focus_pane_right = "prefix+l"
 
 [theme]
 name = "gruvbox"
-
 auto_switch = false
+
 [ui]
 mouse_capture = true
 copy_on_select = true
 tab_bar_position = "bottom"
 pane_borders = "auto"
-pane_outer_borders = false
-pane_gaps = false
 pane_scrollbars = false
 tab_bar_right_separator = " · "
 tab_bar_right = [
